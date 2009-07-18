@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby1.9
+
+$:.unshift(File.dirname(__FILE__))
+
+require 'bib_library.rb'
+require 'papers_library.rb'
+require 'getoptlong'
+require 'kconv'
+
+$stdout.set_encoding("EUC-JP", "UTF-8")
+
+options = GetoptLong.new(
+#  [ "--mode",  "-m", GetoptLong::REQUIRED_ARGUMENT ],
+#  [ "--draft",  "-d", GetoptLong::NO_ARGUMENT ]
+)
+
+
+
+opts = { }
+options.each do |o, a|
+#  if o == "--mode"
+#    opts['Mode'] = a
+#  elsif o == "--draft"
+#    opts['Draft'] = a
+#  end
+end
+
+
+if ARGV.size == 1
+  bl = PapersBibLibrary.new(ARGV[0], "r:UTF-8")
+  bl.out($stdout)
+end

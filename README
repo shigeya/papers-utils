@@ -1,0 +1,19 @@
+Uitlity scripts for Papers
+
+Requires Ruby 1.9 for internationalized code handling.
+
+Papers is available from
+http://mekentosj.com/papers/
+
+
+* papers2bib
+
+Modify bib library exported from Papers which can be handled by
+bibtex.
+
+To use: Export from Papers, then feed into this script, like:
+
+	papers2bib exported.bib > converted.bib
+
+Note: the output code is EUC at this moment. Import code is assumed
+to be UTF-8.
