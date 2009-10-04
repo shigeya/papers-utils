@@ -51,7 +51,6 @@ class BibLibrary < Array
       end
     end
     @keywords_re = Regexp.new("("+@keywords.join("|")+")")
-    STDERR.puts @keywords_re.inspect
   end
 
   def read(file, encoding = "r")
