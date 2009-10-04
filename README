@@ -17,3 +17,14 @@ To use: Export from Papers, then feed into this script, like:
 
 Note: the output code is EUC at this moment. Import code is assumed
 to be UTF-8.
+
+
+If keywords file given, the names listed in the file (one per each
+line) will be treated as keywords, and quote with brances in any of
+journal, title or authors field.
+
+Options:
+
+  -K KEY_FILE or --key-file KEY_FILE
+    Specifying keywords file. If not specified, keywords file
+    will be consulted with the name "BIB_FILE_BASENAME-keywords.txt"

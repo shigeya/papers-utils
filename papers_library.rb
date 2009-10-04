@@ -51,6 +51,18 @@ class PapersBibEntry < BibEntry
     do_rec_uri(l,r)
   end
 
+  def do_rec_title(l, r)
+    r.gsub!(@lib.keywords_re, '{\&}')
+  end
+
+  def do_rec_author(l, r)
+    r.gsub!(@lib.keywords_re, '{\&}')
+  end
+
+  def do_rec_journal(l, r)
+    r.gsub!(@lib.keywords_re, '{\&}')
+  end
+
   ## * article
   ## 
   ## - Specification from LaTeX Companion:
@@ -91,7 +103,7 @@ end
 class PapersBibLibrary < BibLibrary
 
   def new_bib(tag, citekey, lines)
-    PapersBibEntry.new(tag, citekey, lines)
+    PapersBibEntry.new(self, tag, citekey, lines)
   end
 
   def postread

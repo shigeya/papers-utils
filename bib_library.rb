@@ -2,7 +2,8 @@
 
 class BibEntry < Array
   attr_reader :tag, :citekey, :lines
-  def initialize(tag, citekey, lines)
+  def initialize(lib, tag, citekey, lines)
+    @lib = lib
     @tag = tag
     @citekey = citekey
     @lines = lines
@@ -22,11 +23,35 @@ class BibEntry < Array
 end
 
 class BibLibrary < Array
+  attr_reader :keywords_re
 
-  def initialize(file = nil, encoding = "r")
+  def initialize(file = nil, opts)
+    @opts = opts
+    encoding = "r:"+opts[:encoding]
     if file != nil
+      kfile = opts[:key_file]
+      if kfile == ""
+        kfile = File.basename(file, ".bib")+"-keywords.txt"
+      end
+      if File.file?(kfile)
+        read_key(kfile, encoding)
+      end
       read(file, encoding)
     end
+  end
+
+  def read_key(file, encoding = "r")
+    @keywords = Array.new
+    open(file, encoding) do |f|
+      f.each do |l|
+        l.chomp!
+        unless l =~ /^\s*(#|%)/
+          @keywords.push(l)
+        end
+      end
+    end
+    @keywords_re = Regexp.new("("+@keywords.join("|")+")")
+    STDERR.puts @keywords_re.inspect
   end
 
   def read(file, encoding = "r")
@@ -61,7 +86,7 @@ class BibLibrary < Array
   end
 
   def new_bib(tag, citekey, lines)
-    BibEntry.new(tag, citekey, lines)
+    BibEntry.new(self,tag, citekey, lines)
   end
 
   def postread

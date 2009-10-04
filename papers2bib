@@ -9,24 +9,33 @@ require 'kconv'
 
 $stdout.set_encoding("EUC-JP", "UTF-8")
 
-options = GetoptLong.new(
-#  [ "--mode",  "-m", GetoptLong::REQUIRED_ARGUMENT ],
-#  [ "--draft",  "-d", GetoptLong::NO_ARGUMENT ]
-)
+#
+# main
+#
 
+if __FILE__ == $0
+  require 'optparse'
 
+  opts = {                      # default options
+    :mode => "plain",
+    :draft => false,
+    :encoding => "UTF-8",
+    :key_file => ""		# if it's null string, try to generate file by basename
 
-opts = { }
-options.each do |o, a|
-#  if o == "--mode"
-#    opts['Mode'] = a
-#  elsif o == "--draft"
-#    opts['Draft'] = a
-#  end
-end
+  }
 
+  ARGV.options do |o|
+    o.banner = "ruby #{$0} [options] Papers_BIB_File"
+    o.separator "Options:"
 
-if ARGV.size == 1
-  bl = PapersBibLibrary.new(ARGV[0], "r:UTF-8")
-  bl.out($stdout)
+    o.on("-K KEY_FILE", "--key-file KEY_FILE", "Specify keywords file") {|x| opts[:key_file] = x }
+
+    o.parse!
+
+  end
+
+  if ARGV.size == 1
+    bl = PapersBibLibrary.new(ARGV[0], opts)
+    bl.out($stdout)
+  end
 end
