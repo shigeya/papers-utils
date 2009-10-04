@@ -53,7 +53,7 @@ class PapersBibEntry < BibEntry
   end
 
   def do_rec_title(l, r)
-    r.gsub!(@lib.keywords_re, '{\&}')
+    r.gsub!(/\{.*\}/, '{\&}')               # always quote it
     [l, r]
   end
 
