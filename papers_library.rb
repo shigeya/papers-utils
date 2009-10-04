@@ -49,18 +49,22 @@ class PapersBibEntry < BibEntry
 
   def do_rec_url(l, r)
     do_rec_uri(l,r)
+    [l, r]
   end
 
   def do_rec_title(l, r)
     r.gsub!(@lib.keywords_re, '{\&}')
+    [l, r]
   end
 
   def do_rec_author(l, r)
     r.gsub!(@lib.keywords_re, '{\&}')
+    [l, r]
   end
 
   def do_rec_journal(l, r)
     r.gsub!(@lib.keywords_re, '{\&}')
+    [l, r]
   end
 
   ## * article
