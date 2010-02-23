@@ -4,6 +4,19 @@ require 'bib_library'
 
 class PapersBibEntry < BibEntry
   def prep
+    @article_type = :none
+    @lines.each do |line|
+      if line =~ /\s*([\w-]+)\s*=\s*(.*)$/
+        l, r = $1, $2
+        if l=~/keywords/ 
+          if  r =~/specification/
+            @article_type = :specification
+          elsif l=~/keywords/ and r =~/site/
+            @article_type = :site
+          end
+        end
+      end
+    end
     papers2bibtex
   end
 
@@ -91,6 +104,24 @@ class PapersBibEntry < BibEntry
   ## Optional: volume, number, pages, month, note
 
   def do_article
+    # if it's a specification, force to @manual
+    # if it's a site description, force to @misc
+    # I couldn't determin condition whether output will be @manual or @article.
+    if @article_type == :specification
+      @lines.each {|l| l.sub!(/@article{/, "@manual{") }
+      do_manual
+    elsif @article_type == :site
+      @lines.each {|l| l.sub!(/@article{/, "@misc{") }
+      do_misc
+    end
+  end
+
+  ## * manual
+  def do_manual
+  end
+
+  ## * misc
+  def do_misc
   end
 
   ## * inproceedings
