@@ -3,10 +3,15 @@
 require 'bib_library'
 
 class PapersBibEntry < BibEntry
+  def prep
+    papers2bibtex
+  end
+
   def out(o)
     o.puts "% " + "-"*(76 - @citekey.size) + " #{@citekey}"
     o.puts ""
     l, r = "", ""
+
     @lines.each do |line|
       if line =~ /\s*([\w-]+)\s*=\s*(.*)$/
         l, r = $1, $2
@@ -37,9 +42,17 @@ class PapersBibEntry < BibEntry
   ## Per record processing
   ##
 
+  # If there are entries contain http://, quote it.
   def do_rec_note(l, r)
     r.gsub!(/\_/,"\\_")
+    r.gsub!(/{(http:\/\/\S+)(.*)}/, '{\\url{\1}\2}')
     [l, r]
+  end
+
+  # Paper's note appear sometimes as "annote" instead of "note". Map this.
+  def do_rec_annote(l, r)
+    l.sub!(/annote/, "note")
+    do_rec_note(l, r)
   end
 
   def do_rec_uri(l, r)
@@ -48,7 +61,8 @@ class PapersBibEntry < BibEntry
   end
 
   def do_rec_url(l, r)
-    do_rec_uri(l,r)
+    r.gsub!(/\_/,"\\_")
+    r.gsub!(/{(.*)}/, '{\\url\&}')
     [l, r]
   end
 
@@ -111,7 +125,7 @@ class PapersBibLibrary < BibLibrary
   end
 
   def postread
-    self.each {|e| e.papers2bibtex }
+    self.each {|e| e.prep }
   end
 
 end

@@ -9,6 +9,9 @@ class BibEntry < Array
     @lines = lines
   end
 
+  def prep
+  end
+
   def out(o)
     o.puts "%"*(78 - @citekey.size) + " #{@citekey}"
     o.puts ""
@@ -89,6 +92,10 @@ class BibLibrary < Array
   end
 
   def postread
+  end
+
+  def prep(o)
+    self.each {|e| e.prep }
   end
 
   def out(o)
