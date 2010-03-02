@@ -57,7 +57,6 @@ class PapersBibEntry < BibEntry
 
   # If there are entries contain http://, quote it.
   def do_rec_note(l, r)
-    r.gsub!(/\_/,"\\_")
     r.gsub!(/{(http:\/\/\S+)(.*)}/, '{\\url{\1}\2}')
     [l, r]
   end
@@ -69,12 +68,10 @@ class PapersBibEntry < BibEntry
   end
 
   def do_rec_uri(l, r)
-    r.gsub!(/\_/,"\\_")
     [l, r]
   end
 
   def do_rec_url(l, r)
-    r.gsub!(/\_/,"\\_")
     r.gsub!(/{(.*)}/, '{\\url\&}')
     [l, r]
   end
