@@ -3,6 +3,25 @@
 require 'bib_library'
 
 class PapersBibEntry < BibEntry
+  def initialize(lib, tag, citekey, lines)
+    super(lib, tag, citekey, lines)
+    @author_map = { }
+  end
+
+  def add_author_map(e, j)
+    @author_map[e] = j
+  end
+
+  def apply_author_map(r)
+    if @author_map.size != 0
+      old_r = r
+      @author_map.each do |e, j|
+        r.sub!(/#{e}/, j)
+      end
+    end
+    r
+  end
+
   def prep
     @article_type = :none
     @lines.each do |line|
@@ -25,6 +44,20 @@ class PapersBibEntry < BibEntry
     o.puts ""
     l, r = "", ""
 
+    # preparation passes..
+    @lines.each do |line|
+      if line =~ /\s*([\w-]+)\s*=\s*(.*)$/
+        l, r = $1, $2
+        pn = l.gsub(/\-/,"_").downcase
+        begin
+          l, r = eval("do_rec_#{pn}_prep(l, r)")
+        rescue NoMethodError
+          # can't find processing lib
+        end
+      end
+    end
+
+    # output passes.
     @lines.each do |line|
       if line =~ /\s*([\w-]+)\s*=\s*(.*)$/
         l, r = $1, $2
@@ -56,8 +89,30 @@ class PapersBibEntry < BibEntry
   ##
 
   # If there are entries contain http://, quote it.
+  # If there are entries contain JapanesAuthorMaps, use it as author name mapping
+  def do_rec_note_prep(l, r)
+    if r =~ /JapaneseAuthorsMap:\s*(.*)\},/
+      mapstr = $1
+      maplist = mapstr.split(/,\s*/)
+      maplist.each do |a|
+        e, j = a.split(/:\s*/)
+        add_author_map(e, j)
+      end
+    end
+    [l, r]
+  end
+
+  # Paper's note appear sometimes as "annote" instead of "note". Map this.
+  def do_rec_annote_prep(l, r)
+    do_rec_note_prep(l, r)
+    [l, r]
+  end
+
+  #
+
   def do_rec_note(l, r)
     r.gsub!(/{(http:\/\/\S+)(.*)}/, '{\\url{\1}\2}')
+    r.gsub!(/JapaneseAuthorsMap:\s*(.*)\},/, "},")
     [l, r]
   end
 
@@ -83,6 +138,7 @@ class PapersBibEntry < BibEntry
 
   def do_rec_author(l, r)
     r.gsub!(@lib.keywords_re, '{\&}')
+    r = apply_author_map(r)
     [l, r]
   end
 
@@ -147,7 +203,6 @@ class PapersBibEntry < BibEntry
 end
 
 class PapersBibLibrary < BibLibrary
-
   def new_bib(tag, citekey, lines)
     PapersBibEntry.new(self, tag, citekey, lines)
   end

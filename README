@@ -28,3 +28,16 @@ Options:
   -K KEY_FILE or --key-file KEY_FILE
     Specifying keywords file. If not specified, keywords file
     will be consulted with the name "BIB_FILE_BASENAME-keywords.txt"
+
+
+* Japanese Name Hacks
+
+If there is "JapaneseAutorMap:.*" string in a note of the entry,
+strings following it is treated as mapping between English name into
+Japanese name. For example,
+
+JapanesAuthorMap: Yamada Taro: _YAMADA_ _TARO_, Yamada Jiro: _YAMADA_ _JIRO_
+
+# _NAME_ denotes kanji characters
+
+Maps english napes into Japanese name, respectively.
