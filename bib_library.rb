@@ -48,7 +48,7 @@ class BibLibrary < Array
     open(file, encoding) do |f|
       f.each do |l|
         l.chomp!
-        unless l =~ /^\s*(#|%)/
+        unless l =~ /^\s*(#|%)/ || l =~ /^\s*$/
           @keywords.push(l)
         end
       end
