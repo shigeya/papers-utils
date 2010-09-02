@@ -23,6 +23,7 @@ class PapersBibEntry < BibEntry
   end
 
   def prep
+    super.prep
     @article_type = :none
     @lines.each do |line|
       if line =~ /\s*([\w-]+)\s*=\s*(.*)$/
@@ -208,7 +209,7 @@ class PapersBibLibrary < BibLibrary
   end
 
   def postread
-    self.each {|e| e.prep }
+    super.postread
   end
 
 end

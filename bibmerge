@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 #
-# Read bib file and check the difference for merge
+# Read several bib files and merge into one
+#
+# check the values of:
+#   date-written-via-bibdump
+#   date-modified
 #
 
 $:.unshift(File.dirname(__FILE__))
@@ -26,12 +30,11 @@ if __FILE__ == $0
     :encoding => "UTF-8",
     :output_encoding => "UTF-8",
     :key_file => "",	# if it's null string, try to generate file by basename
-    :output_dir => "./bib",
+    :bib_dir => "./bib",
     :force => false,
     :timestamp => true,
-    :write => false,
-    :list => false,
-    :mismatch_dump => false
+    :add => false,
+    :overwrite => false,
   }
 
   ARGV.options do |o|
@@ -49,48 +52,21 @@ if __FILE__ == $0
 
     o.on("--force", "-f", "Force to overwrite files") {|x| opts[:force] = true }
     o.on("--no-time-stamp", "-t", "don't add bibdump date") {|x| opts[:timestamp] = false }
-    o.on("--write", "-w", "Write out each entries in each file in the output-dir") {|x| opts[:write] = true }
-    o.on("--list", "-l", "List bib cite keys") {|x| opts[:list] = true }
+    o.on("--add", "-a", "Add to primary if missing") {|x| opts[:add] = true }
+    o.on("--overwrite", "-o", "Do overwrite if needed") {|x| opts[:overwrite] = true }
+    o.on("--dump-mismatch", "-d", "Dump mismatched entries") {|x| opts[:dump_mismatch] = true }
 
     o.parse!
   end
 
   if ARGV.size >= 1
     blib = BibLibrary.new(ARGV.shift, opts)
-    cite_keys = blib.keys.sort
-    if ARGV.size > 0
-      cite_keys = ARGV
+
+    ARGV.each do |f|
+      new_blib = BibLibrary.new(f, opts)
+      blib.merge(new_blib)
     end
 
-    # List cite keys. If parameters are given, only list that key if exists
-    if opts[:list] 
-      cite_keys.each do |k|
-        puts k if blib.has_key?(k)
-      end
-
-    # Write out each entries in the dir, 
-    elsif opts[:write] 
-      marker_lines = []
-      if opts[:timestamp]
-        marker_lines = [ ", date-written-via-bibdump = {#{DateTime.now.to_s}}" ] 
-      end
-      unless File.directory?(opts[:output_dir])
-        puts "Directory #{opts[:output_dir]} does not exists"
-      else
-        cite_keys.each do |c|
-          unless blib.has_key?(c)
-            puts "cite key <#{c}> does not exist"
-          else
-            e = blib[c]
-            file = opts[:output_dir] + "/" + c + ".bib"
-            if File.file?(file) and opts[:force] == false
-              puts "File #{file} alrady exists -- don't overwrite"
-            else
-              e.write_to_file(file, opts, marker_lines)
-            end
-          end
-        end
-      end
-    end
+    blib.out(STDOUT)
   end
 end
