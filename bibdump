@@ -52,27 +52,38 @@ if __FILE__ == $0
   end
 
   if ARGV.size >= 1
-    bl = BibLibrary.new(ARGV[0], opts)
+    blib = BibLibrary.new(ARGV.shift, opts)
+    cite_keys = blib.keys.sort
+    if ARGV.size > 0
+      cite_keys = ARGV
+    end
 
-    if opts[:list]  # List cite keys
-      bl.sort{|a,b| a.citekey.capitalize <=> b.citekey.capitalize }.each do |e|
-        puts e.citekey
+    # List cite keys. If parameters are given, only list that key if exists
+    if opts[:list] 
+      cite_keys.each do |k|
+        puts k if blib.has_key?(k)
       end
-    elsif opts[:write] # Write out each entries in the dir
+
+    # Write out each entries in the dir, 
+    elsif opts[:write] 
       marker_lines = []
       if opts[:timestamp]
         marker_lines = [ ", date-written-via-bibdump = {#{DateTime.now.to_s}}" ] 
       end
-
       unless File.directory?(opts[:output_dir])
         puts "Directory #{opts[:output_dir]} does not exists"
       else
-        bl.sort{|a,b| a.citekey.capitalize <=> b.citekey.capitalize }.each do |e|
-          file = opts[:output_dir] + "/" + e.citekey+".bib"
-          if File.file?(file) and opts[:force] == false
-            puts "File #{file} alrady exists -- don't overwrite"
+        cite_keys.each do |c|
+          unless blib.has_key?(c)
+            puts "cite key <#{c}> does not exist"
           else
-            e.write_to_file(file, opts, marker_lines)
+            e = blib[c]
+            file = opts[:output_dir] + "/" + c + ".bib"
+            if File.file?(file) and opts[:force] == false
+              puts "File #{file} alrady exists -- don't overwrite"
+            else
+              e.write_to_file(file, opts, marker_lines)
+            end
           end
         end
       end

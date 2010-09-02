@@ -38,7 +38,7 @@ class BibEntry < Array
 
 end
 
-class BibLibrary < Array
+class BibLibrary < Hash
   attr_reader :keywords_re
 
   def read_opt(opts)
@@ -94,7 +94,7 @@ class BibLibrary < Array
           lines.push(l) if inside
           
           if l =~ /^\}$/
-            self.push(new_bib(tag, citekey, lines))
+            self[citekey] = new_bib(tag, citekey, lines)
             lines = nil
             inside = false
           end
@@ -112,15 +112,15 @@ class BibLibrary < Array
   end
 
   def prep(o)
-    self.each {|e| e.prep }
+    self.each {|k, v| v.prep }
   end
 
   def out(o)
-    self.sort{|a,b| a.citekey.capitalize <=> b.citekey.capitalize }.each {|e| e.out(o) }
+    self.keys.sort.each {|k| self[k].out(o) }
   end
 
   def to_s
-    self.map {|b| b.to_s}.join("\n")
+    self.keys.sort.each{|k| self[k].to_s }.join("\n")
   end
 
 end
