@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+#
+# Read bib file and check the difference for merge
+#
 
 $:.unshift(File.dirname(__FILE__))
 
@@ -41,7 +44,7 @@ if __FILE__ == $0
     o.on("--output-euc-jp", "Set output encoding to EUC-JP") {|x| opts[:output_encoding] = "EUC-JP" }
     o.on("--output-sjis", "Set output encoding to Shift_JIS") {|x| opts[:output_encoding] = "Shift_JIS" }
 
-    o.on("--output-dir", "-O DIR", "Set output dir (currently ./bib)") {|x| opts[:output_dir] = x }
+    o.on("--bib-dir", "-B DIR", "Set bib dir (currently ./bib)") {|x| opts[:output_dir] = x }
 
     o.on("--force", "-f", "Force to overwrite files") {|x| opts[:force] = true }
     o.on("--no-time-stamp", "-t", "don't add bibdump date") {|x| opts[:timestamp] = false }

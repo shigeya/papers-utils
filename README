@@ -41,7 +41,7 @@ Options:
         --output-utf-8               Set output encoding to UTF-8
         --output-euc-jp              Set output encoding to EUC-JP
         --output-sjis                Set output encoding to Shift_JIS
-    -O, --output-dir DIR             Set output dir (currently ./bib)
+    -B, --bib-dir DIR                Set output dir (currently ./bib)
     -f, --force                      Force to overwrite files
     -t, --no-time-stamp              don't add bibdump date
     -w, --write                      Write out each entries in each file in the output-dir
