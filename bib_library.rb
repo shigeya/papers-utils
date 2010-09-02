@@ -225,4 +225,15 @@ class BibLibrary < Hash
     end
   end
 
+  def mkbibpath(c)
+    if ! ( c =~ /\.bib$/ )
+      return @opts[:bib_dir] + "/" + c + ".bib"
+    elsif File.file?(c)
+      return c
+    elsif File.file?(@opts[:bib_dir] + "/" + c)
+      return @opts[:bib_dir] + "/" + c
+    end
+    c
+  end
+
 end

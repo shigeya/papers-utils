@@ -61,11 +61,33 @@ To list the citation key in the file (you must give correct encoding):
 Note: output filename is same as the citation key with suffix ".bib"
 
 
+* bibmerge
+
+Merge given bibs onto primary bib file BIB_FILE
+
+ruby ./bibmerge [options] BIB_File {cite_keys|bib_files}..
+Options:
+    -u, --utf-8                      Set both i/o encoding to UTF-8
+    -e, --euc-jp                     Set both i/o encoding to EUC-JP
+    -s, --sjis                       Set both i/o encoding to Shift_JIS
+        --output-utf-8               Set output encoding to UTF-8
+        --output-euc-jp              Set output encoding to EUC-JP
+        --output-sjis                Set output encoding to Shift_JIS
+    -B, --bib-dir DIR                Set bib dir (currently ./bib)
+    -f, --force                      Force to overwrite files
+    -t, --no-time-stamp              don't add bibdump date
+    -a, --add                        Add to primary if missing
+    -o, --overwrite                  Do overwrite if needed
+    -d, --dump-mismatch              Dump mismatched entries
+
+
+
+
 * Japanese Name Hacks
 
 If there is "JapaneseAutorMap:.*" string in a note of the entry in the
-Papers entries, strings following it is treated as mapping between
-English name into Japanese name. For example,
+Papers applications' paper entries, strings following it is treated as
+mapping between English name into Japanese name. For example,
 
 JapanesAuthorMap: Yamada Taro: _YAMADA_ _TARO_, Yamada Jiro: _YAMADA_ _JIRO_
 
