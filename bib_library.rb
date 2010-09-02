@@ -23,23 +23,40 @@ class BibEntry < Array
     "@#{@tag} #{@citekey}"
   end
 
+  def write_opt(opts)
+    "w" + ( opts.has_key?(:output_encoding) ? ":"+opts[:output_encoding] : "")
+  end
+
+  def write_to_file(file, opts, marker_lines = [])
+    STDERR.puts "Writing citation <#{@citekey}> to #{file}"
+    open(file, write_opt(opts)) do |f|
+      @lines.each {|l| f.puts l unless l =~ /^}/ }
+      marker_lines.each {|l| f.puts l }
+      f.puts "}"
+    end
+  end
+
 end
 
 class BibLibrary < Array
   attr_reader :keywords_re
 
+  def read_opt(opts)
+    "r" + ( opts.has_key?(:encoding) ? ":"+opts[:encoding] : "")
+  end
+
   def initialize(file = nil, opts)
     @opts = opts
-    encoding = "r:"+opts[:encoding]
+    ropt = read_opt(opts)
     if file != nil
       kfile = opts[:key_file]
       if kfile == ""
         kfile = File.basename(file, ".bib")+"-keywords.txt"
       end
       if File.file?(kfile)
-        read_key(kfile, encoding)
+        read_key(kfile, ropt)
       end
-      read(file, encoding)
+      read(file, ropt)
     end
   end
 
@@ -56,12 +73,12 @@ class BibLibrary < Array
     @keywords_re = Regexp.new("("+@keywords.join("|")+")")
   end
 
-  def read(file, encoding = "r")
+  def read(file, read_opt)
     lines = nil
     inside = false
     tag = "?"
     citekey = "?"
-    open(file, encoding) do |f|
+    open(file, read_opt) do |f|
       f.each do |l|
         if l =~ /^%/
           # comments

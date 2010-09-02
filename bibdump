@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+
+$:.unshift(File.dirname(__FILE__))
+
+require 'bib_library.rb'
+require 'papers_library.rb'
+require 'getoptlong'
+require 'kconv'
+require 'date'
+
+$stdout.set_encoding("EUC-JP", "UTF-8")
+
+#
+# main
+#
+
+if __FILE__ == $0
+  require 'optparse'
+
+  opts = {                      # default options
+    :mode => "plain",
+    :draft => false,
+    :encoding => "UTF-8",
+    :output_encoding => "UTF-8",
+    :key_file => "",	# if it's null string, try to generate file by basename
+    :output_dir => "./bib",
+    :force => false,
+    :timestamp => true,
+    :write => false,
+    :list => false,
+  }
+
+  ARGV.options do |o|
+    o.banner = "ruby #{$0} [options] BIB_File {cite_keys..}"
+    o.separator "Options:"
+    o.on("--utf-8", "-u", "Set both i/o encoding to UTF-8") {|x| opts[:encoding] = "UTF-8" ; opts[:output_encoding] = opts[:encoding] }
+    o.on("--euc-jp", "-e", "Set both i/o encoding to EUC-JP") {|x| opts[:encoding] = "EUC-JP" ; opts[:output_encoding] = opts[:encoding] }
+    o.on("--sjis", "-s", "Set both i/o encoding to Shift_JIS") {|x| opts[:encoding] = "Shift_JIS" ; opts[:output_encoding] = opts[:encoding] }
+
+    o.on("--output-utf-8", "Set output encoding to UTF-8") {|x| opts[:output_encoding] = "UTF-8" }
+    o.on("--output-euc-jp", "Set output encoding to EUC-JP") {|x| opts[:output_encoding] = "EUC-JP" }
+    o.on("--output-sjis", "Set output encoding to Shift_JIS") {|x| opts[:output_encoding] = "Shift_JIS" }
+
+    o.on("--output-dir", "-O DIR", "Set output dir (currently ./bib)") {|x| opts[:output_dir] = x }
+
+    o.on("--force", "-f", "Force to overwrite files") {|x| opts[:force] = true }
+    o.on("--no-time-stamp", "-t", "don't add bibdump date") {|x| opts[:timestamp] = false }
+    o.on("--write", "-w", "Write out each entries in each file in the output-dir") {|x| opts[:write] = true }
+    o.on("--list", "-l", "List bib cite keys") {|x| opts[:list] = true }
+
+    o.parse!
+  end
+
+  if ARGV.size >= 1
+    bl = BibLibrary.new(ARGV[0], opts)
+
+    if opts[:list]  # List cite keys
+      bl.sort{|a,b| a.citekey.capitalize <=> b.citekey.capitalize }.each do |e|
+        puts e.citekey
+      end
+    elsif opts[:write] # Write out each entries in the dir
+      marker_lines = []
+      if opts[:timestamp]
+        marker_lines = [ ", date-written-via-bibdump = {#{DateTime.now.to_s}}" ] 
+      end
+
+      unless File.directory?(opts[:output_dir])
+        puts "Directory #{opts[:output_dir]} does not exists"
+      else
+        bl.sort{|a,b| a.citekey.capitalize <=> b.citekey.capitalize }.each do |e|
+          file = opts[:output_dir] + "/" + e.citekey+".bib"
+          if File.file?(file) and opts[:force] == false
+            puts "File #{file} alrady exists -- don't overwrite"
+          else
+            e.write_to_file(file, opts, marker_lines)
+          end
+        end
+      end
+    end
+  end
+end

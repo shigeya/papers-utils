@@ -30,11 +30,42 @@ Options:
     will be consulted with the name "BIB_FILE_BASENAME-keywords.txt"
 
 
+* bibdump
+
+Read bib file and dump.
+
+Options:
+    -u, --utf-8                      Set both i/o encoding to UTF-8
+    -e, --euc-jp                     Set both i/o encoding to EUC-JP
+    -s, --sjis                       Set both i/o encoding to Shift_JIS
+        --output-utf-8               Set output encoding to UTF-8
+        --output-euc-jp              Set output encoding to EUC-JP
+        --output-sjis                Set output encoding to Shift_JIS
+    -O, --output-dir DIR             Set output dir (currently ./bib)
+    -f, --force                      Force to overwrite files
+    -t, --no-time-stamp              don't add bibdump date
+    -w, --write                      Write out each entries in each file in the output-dir
+    -l, --list                       List bib cite keys
+
+Usage:
+
+To write out per-bib entry file from BIBFILE.bib (in EUC-JP):
+	bibdump -w -e BIBFILE.bib
+
+To write out per-bib entry file from BIBFILE.bib (in EUC-JP), output in UTF-8
+	bibdump -w -e --output-utf-8 BIBFILE.bib
+
+To list the citation key in the file (you must give correct encoding):
+	bibdump -l BIBFILE.bib
+
+Note: output filename is same as the citation key with suffix ".bib"
+
+
 * Japanese Name Hacks
 
-If there is "JapaneseAutorMap:.*" string in a note of the entry,
-strings following it is treated as mapping between English name into
-Japanese name. For example,
+If there is "JapaneseAutorMap:.*" string in a note of the entry in the
+Papers entries, strings following it is treated as mapping between
+English name into Japanese name. For example,
 
 JapanesAuthorMap: Yamada Taro: _YAMADA_ _TARO_, Yamada Jiro: _YAMADA_ _JIRO_
 
