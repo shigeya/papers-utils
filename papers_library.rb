@@ -68,7 +68,11 @@ class PapersBibEntry < BibEntry
         rescue NoMethodError
           # can't find processing lib
         end
-        o.puts "  #{l} = #{r}"
+        begin
+          o.puts "  #{l} = #{r}"
+        rescue Encoding::UndefinedConversionError
+          STDERR.puts "!!! Can't Convert: #{l} = #{r}"
+        end
       else
         o.puts line
       end
