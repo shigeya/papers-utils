@@ -135,28 +135,34 @@ class BibLibrary < Hash
     inside = false
     tag = "?"
     citekey = "?"
-    open(file, read_opt) do |f|
-      f.each do |l|
-        if l =~ /^%/
-          # comments
-        elsif l =~ /^\s+$/
-          # blank lines
-        else 
-          if l =~ /^\@([A-Za-z]+)\{([^,]+),$/
-            tag, citekey = $1, $2
-            lines = [ ]
-            inside = true
-          end
 
-          lines.push(l) if inside
-          
-          if l =~ /^\}$/
-            self[citekey] = new_bib(tag, citekey, lines)
-            lines = nil
-            inside = false
+    begin
+      open(bibpathnormalize(file), read_opt) do |f|
+        f.each do |l|
+          if l =~ /^%/
+            # comments
+          elsif l =~ /^\s+$/
+            # blank lines
+          else 
+            if l =~ /^\@([A-Za-z]+)\{([^,]+),$/
+              tag, citekey = $1, $2
+              lines = [ ]
+              inside = true
+            end
+
+            lines.push(l) if inside
+            
+            if l =~ /^\}$/
+              self[citekey] = new_bib(tag, citekey, lines)
+              lines = nil
+              inside = false
+            end
           end
         end
       end
+    rescue ArgumentError
+      STDERR.puts "invalid byte sequence in #{file}"
+      exit 1
     end
     postread
   end
@@ -225,15 +231,20 @@ class BibLibrary < Hash
     end
   end
 
+  def bibpathnormalize(c)
+     c.sub(/:/, "_")
+  end
+
   def mkbibpath(c)
-    if ! ( c =~ /\.bib$/ )
-      return @opts[:bib_dir] + "/" + c + ".bib"
-    elsif File.file?(c)
-      return c
-    elsif File.file?(@opts[:bib_dir] + "/" + c)
-      return @opts[:bib_dir] + "/" + c
+    s = bibpathnormalize(c)
+    if ! ( s =~ /\.bib$/ )
+      return @opts[:bib_dir] + "/" + s + ".bib"
+    elsif File.file?(s)
+      return s
+    elsif File.file?(@opts[:bib_dir] + "/" + s)
+      return @opts[:bib_dir] + "/" + s
     end
-    c
+    s
   end
 
 end
