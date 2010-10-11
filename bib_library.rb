@@ -232,7 +232,7 @@ class BibLibrary < Hash
   end
 
   def bibpathnormalize(c)
-     c.sub(/:/, "_")
+     c.gsub(/:/, "_")
   end
 
   def mkbibpath(c)
