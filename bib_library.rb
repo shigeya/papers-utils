@@ -85,9 +85,10 @@ class BibEntry < Array
   # added > modified, and date added should be same.
   def inconsistent?(x)
     if @date_added > @date_modified or
-        x.date_added > x.date_modified or
-        @date_added != x.date_added or
-        @date_modified > x.date_modified
+        x.date_added > x.date_modified
+#        @date_added != x.date_added or
+#        @date_modified > x.date_modified
+
       return true
     end
     false
@@ -203,7 +204,7 @@ class BibLibrary < Hash
       STDERR.puts "<#{n.citekey}> do not exist in primary bib file. use --add to force adding them"
     else
       old = self[citekey]
-      if old == n               # if contents is same.. don't replace
+      if old.hash == n.hash               # if contents is same.. don't replace
         STDERR.puts "Skiping: <#{citekey}>"
       elsif old.inconsistent?(n)
         STDERR.puts "Inconsistent: <#{citekey}>"
