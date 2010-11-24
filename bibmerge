@@ -35,6 +35,8 @@ if __FILE__ == $0
     :timestamp => true,
     :add => false,
     :overwrite => false,
+    :group => false,
+    :dep_dump => false
   }
 
   ARGV.options do |o|
@@ -56,18 +58,37 @@ if __FILE__ == $0
     o.on("--overwrite", "-o", "Do overwrite if needed") {|x| opts[:overwrite] = true }
     o.on("--dump-mismatch", "-d", "Dump mismatched entries") {|x| opts[:dump_mismatch] = true }
 
+    o.on("--group GROUP", "-G GROUP", "Configure group mode") {|x| opts[:group] = x }
+
+    o.on("--dep-dump", "-p", "Dump dependencies") {|x| opts[:dep_dump] = true }
+
     o.parse!
   end
 
+
   if ARGV.size >= 1
-    blib = BibLibrary.new(ARGV.shift, opts)
-
-    ARGV.each do |f|
-      bibfile = blib.mkbibpath(f)
-      new_blib = BibLibrary.new(bibfile, opts)
-      blib.merge(new_blib)
+    if opts[:dep_dump] == true
+      blib = BibLibrary.new(nil, opts)
+      ARGV.each do |f|
+        bibfile = blib.mkbibpath(f)
+        if bibfile == nil
+          STDERR.puts "#{f} not found"
+        else
+          puts bibfile
+        end
+      end
+    else
+      blib = BibLibrary.new(ARGV.shift, opts)
+      ARGV.each do |f|
+        bibfile = blib.mkbibpath(f)
+        if bibfile == nil
+          STDERR.puts "#{f} not found"
+        else
+          new_blib = BibLibrary.new(bibfile, opts)
+          blib.merge(new_blib)
+        end
+      end
+      blib.out(STDOUT)
     end
-
-    blib.out(STDOUT)
   end
 end

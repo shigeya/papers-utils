@@ -79,8 +79,8 @@ Options:
     -a, --add                        Add to primary if missing
     -o, --overwrite                  Do overwrite if needed
     -d, --dump-mismatch              Dump mismatched entries
-
-
+    -p, --dep-dump		     Dump the list of BIB files bibmerge actually found and merged
+    -G GROUP, --group GROUP	     add GROUP as part of suffix (using .{GROUP}-bib prior to .bib)
 
 
 * Japanese Name Hacks

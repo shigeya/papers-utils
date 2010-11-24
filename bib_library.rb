@@ -236,16 +236,24 @@ class BibLibrary < Hash
      c.gsub(/:/, "_")
   end
 
+  def bibdirpath(s)
+    @opts[:bib_dir] + "/" + s + ".bib"
+  end
+
+  def mkbibpath_1(c, suffix)
+    return nil if c == nil
+    fn = @opts[:bib_dir] + "/" + c + "." + suffix
+    return fn if File.file?(fn)
+    return nil
+  end
+
+
   def mkbibpath(c)
     s = bibpathnormalize(c)
-    if ! ( s =~ /\.bib$/ )
-      return @opts[:bib_dir] + "/" + s + ".bib"
-    elsif File.file?(s)
-      return s
-    elsif File.file?(@opts[:bib_dir] + "/" + s)
-      return @opts[:bib_dir] + "/" + s
-    end
-    s
+    r = nil
+    r = mkbibpath_1(s, "#{@opts[:group]}-bib") if @opts[:group] != nil
+    r = mkbibpath_1(s, "bib") if r == nil
+    return r
   end
 
 end
