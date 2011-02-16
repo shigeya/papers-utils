@@ -57,7 +57,7 @@ class BibEntry < Array
   def write_to_file(file, opts, marker_lines = [])
     STDERR.puts "Writing citation <#{@citekey}> to #{file}"
     open(file, write_opt(opts)) do |f|
-      @lines.each {|l| f.puts l unless l =~ /^}\s*$/ }
+      @lines.each {|l| f.puts l unless l =~ /^}\s*$/ } if @lines != nil
       marker_lines.each {|l| f.puts l }
       f.puts "}"
     end
@@ -165,7 +165,7 @@ class BibLibrary < Hash
       STDERR.puts "invalid byte sequence in #{file}"
       exit 1
     end
-    postread
+    postread if lines != nil
   end
 
   def new_bib(tag, citekey, lines)
@@ -240,19 +240,24 @@ class BibLibrary < Hash
     @opts[:bib_dir] + "/" + s + ".bib"
   end
 
-  def mkbibpath_1(c, suffix)
+  def mkbibpath_1(c, suffix, wflag = false)
     return nil if c == nil
     fn = @opts[:bib_dir] + "/" + c + "." + suffix
-    return fn if File.file?(fn)
+    if wflag == nil
+      return fn if File.file?(fn)
+    else # only check for existing of directory
+      return fn if File.directory?(File.dirname(fn))
+    end
+
     return nil
   end
 
 
-  def mkbibpath(c)
+  def mkbibpath(c, wflag = false)
     s = bibpathnormalize(c)
     r = nil
-    r = mkbibpath_1(s, "#{@opts[:group]}-bib") if @opts[:group] != nil
-    r = mkbibpath_1(s, "bib") if r == nil
+    r = mkbibpath_1(s, "#{@opts[:group]}-bib", wflag) if @opts[:group] != nil
+    r = mkbibpath_1(s, "bib", wflag) if r == nil
     return r
   end
 

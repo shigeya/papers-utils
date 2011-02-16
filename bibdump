@@ -10,6 +10,7 @@ require 'papers_library.rb'
 require 'getoptlong'
 require 'kconv'
 require 'date'
+require 'ap'
 
 $stdout.set_encoding("EUC-JP", "UTF-8")
 
@@ -82,7 +83,7 @@ if __FILE__ == $0
             puts "cite key <#{c}> does not exist"
           else
             e = blib[c]
-            file = blib.mkbibpath(c)
+            file = blib.mkbibpath(c, true)
             if File.file?(file) and opts[:force] == false
               puts "File #{file} alrady exists -- don't overwrite"
             else
