@@ -102,6 +102,8 @@ class PapersBibEntry < BibEntry
       maplist.each do |a|
         e, j = a.split(/:\s*/)
         add_author_map(e, j)
+        f, l = e.split(/\s+/)
+        add_author_map("#{l}, #{f}", j)
       end
     end
     [l, r]
