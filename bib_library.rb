@@ -165,7 +165,7 @@ class BibLibrary < Hash
       STDERR.puts "invalid byte sequence in #{file}"
       exit 1
     end
-    postread if lines != nil
+    postread if self.size != 0
   end
 
   def new_bib(tag, citekey, lines)
@@ -173,7 +173,7 @@ class BibLibrary < Hash
   end
 
   def postread
-    self.prep
+    prep
   end
 
   def prep
