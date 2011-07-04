@@ -257,7 +257,10 @@ class BibLibrary < Hash
   def mkbibpath(c, wflag = false)
     s = bibpathnormalize(c)
     r = nil
-    r = mkbibpath_1(s, "#{@opts[:group]}-bib", wflag) if @opts[:group] != nil
+    if @opts[:group] != nil
+      p = mkbibpath_1(s, "#{@opts[:group]}-bib", wflag)
+      r = p if File.file?(p)
+    end
     r = mkbibpath_1(s, "bib", wflag) if r == nil
     return r
   end
