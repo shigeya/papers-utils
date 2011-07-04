@@ -23,6 +23,7 @@ class BibEntry < Array
     @hash = Digest::MD5.new
 
     # Parsing several dates
+    @lines ||= [ ]
     @lines.each do |line|
       if line =~ /\s*date-(\S+)\s*=\s*{\s*(.+)\s*}/
         k, d = $1, DateTime.parse($2)
@@ -177,11 +178,11 @@ class BibLibrary < Hash
   end
 
   def prep
-    self.each {|k, v| v.prep }
+    each {|k, v| v.prep }
   end
 
   def out(o)
-    self.keys.sort.each {|k| self[k].out(o) }
+    keys.sort.each {|k| self[k].out(o) }
   end
 
   def to_s
