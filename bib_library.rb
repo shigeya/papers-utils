@@ -259,7 +259,10 @@ class BibLibrary < Hash
     r = nil
     if @opts[:group] != nil
       p = mkbibpath_1(s, "#{@opts[:group]}-bib", wflag)
-      r = p if File.file?(p)
+      if File.file?(p)
+        STDERR.puts "Found: group <#{@opts[:group]}> variant for #{s}"
+        r = p
+      end
     end
     r = mkbibpath_1(s, "bib", wflag) if r == nil
     return r
