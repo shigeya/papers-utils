@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+#
+# Read bib file and create link output for 
+# <A HREF="{citeation_key}.pdf">
+#
+
+$:.unshift(File.dirname(__FILE__))
+
+require 'bib_library.rb'
+require 'papers_library.rb'
+require 'getoptlong'
+require 'kconv'
+require 'date'
+require 'ap'
+
+$stdout.set_encoding("UTF-8")
+
+#
+# main
+#
+
+if __FILE__ == $0
+  require 'optparse'
+
+  opts = {                      # default options
+    :mode => "plain",
+    :draft => false,
+    :encoding => "UTF-8",
+    :output_encoding => "UTF-8",
+    :key_file => "",	# if it's null string, try to generate file by basename
+    :bib_dir => "./bib",
+    :force => false,
+    :timestamp => true,
+    :write => false,
+    :list => false,
+    :mismatch_dump => false
+  }
+
+  ARGV.options do |o|
+    o.banner = "ruby #{$0} [options] BIB_File {cite_keys..}"
+    o.separator "Options:"
+    o.parse!
+  end
+
+  if ARGV.size >= 1
+    blib = BibLibrary.new(ARGV.shift, opts)
+    cite_keys = blib.keys.sort
+    if ARGV.size > 0
+      cite_keys = ARGV
+    end
+
+    cite_keys.each do |ck|
+      bib = blib[ck]
+      bib.prep
+      au = bib.authors || [ ]
+      puts "<tr>"
+      puts "<td><A HREF=\"#{ck}.pdf\">#{ck}</td>"
+      puts "<td>#{bib.title}</td>"
+      puts "<td>#{au.join(', ')}</td>"
+      puts "</tr>"
+    end
+  end
+end

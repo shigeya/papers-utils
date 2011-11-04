@@ -4,7 +4,7 @@ require 'date'
 require 'digest/md5'
 
 class BibEntry < Array
-  attr_reader :tag, :citekey, :lines, :hash
+  attr_reader :tag, :citekey, :lines, :bib_hash, :title, :author, :authors
   attr_reader :date_added, :date_processed, :date_modified
 
   def initialize(lib, tag, citekey, lines)
@@ -15,17 +15,32 @@ class BibEntry < Array
     @date_added = 0
     @date_modified = 0
     @date_processed = 0
-    @hash = 0
+    @bib_hash = 0
+    @title = ""
+    @author = ""
   end
 
   def prep
     # create digest of the object, ignoring date related fields
-    @hash = Digest::MD5.new
+    @bib_hash = Digest::MD5.new
 
-    # Parsing several dates
+    # Parsing several dates and some important fields
     @lines ||= [ ]
     @lines.each do |line|
-      if line =~ /\s*date-(\S+)\s*=\s*{\s*(.+)\s*}/
+      if line =~ /\s*booktitle\s*=\s*{(.*)},?\s*$/
+        @booktitle = $1
+        @booktitle.gsub!(/\{*/, '')
+        @booktitle.gsub!(/\},/, '')
+      elsif line =~ /\s*title\s*=\s*{(.*)},?\s*$/
+        @title = $1
+        @title.gsub!(/\{/, '')
+        @title.gsub!(/\}/, '')
+      elsif line =~ /\s*author\s*=\s*{(.*)},?\s*$/
+        @author = $1
+        @author.gsub!(/\{/, '')
+        @author.gsub!(/\}/, '')
+        @authors = @author.split(/ and /)
+      elsif line =~ /\s*date-(\S+)\s*=\s*{\s*(.+)\s*}/
         k, d = $1, DateTime.parse($2)
         if k == "added"
           @date_added = d
@@ -35,7 +50,7 @@ class BibEntry < Array
           @date_processed = d
         end
       else
-        @hash.update(line)
+        @bib_hash.update(line)
       end
     end
   end
@@ -66,14 +81,14 @@ class BibEntry < Array
 
   # equality means: contents other than date fields match exactly
   def ==(x)
-    if hash == x.hash
+    if @bib_hash == x.bib_hash
       if @date_added == x.date_added and 
           @date_modified == x.date_modified
         return true
       else
       end
     else
-      STDERR.puts "<#{citekey}> Hash Mismatch: #{hash} #{x.hash}"
+      STDERR.puts "<#{citekey}> Bib_Hash Mismatch: #{bib_hash} #{x.bib_hash}"
       return false
     end
 
@@ -205,21 +220,21 @@ class BibLibrary < Hash
       STDERR.puts "<#{n.citekey}> do not exist in primary bib file. use --add to force adding them"
     else
       old = self[citekey]
-      if old.hash == n.hash               # if contents is same.. don't replace
+      if old.bib_hash == n.bib_hash               # if contents is same.. don't replace
         STDERR.puts "Skiping: <#{citekey}>"
       elsif old.inconsistent?(n)
         STDERR.puts "Inconsistent: <#{citekey}>"
         if @opts[:dump_mismatch]
-          STDERR.puts "----- #{old.hash}"
+          STDERR.puts "----- #{old.bib_hash}"
           STDERR.puts old.to_s
-          STDERR.puts "----- #{n.hash}"
+          STDERR.puts "----- #{n.bib_hash}"
           STDERR.puts n.to_s
         end
       else
         if @opts[:dump_mismatch]
-          STDERR.puts "----- #{old.hash}"
+          STDERR.puts "----- #{old.bib_hash}"
           STDERR.puts old.to_s
-          STDERR.puts "----- #{n.hash}"
+          STDERR.puts "----- #{n.bib_hash}"
           STDERR.puts n.to_s
         end
 
