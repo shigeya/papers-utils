@@ -53,8 +53,10 @@ if __FILE__ == $0
       bib = blib[ck]
       bib.prep
       au = bib.authors || [ ]
+      f = "#{ck}.pdf"
+      f.gsub!(/:/, '_')
       puts "<tr>"
-      puts "<td><A HREF=\"#{ck}.pdf\">#{ck}</td>"
+      puts "<td><A HREF=\"#{f}\">#{ck}</td>"
       puts "<td>#{bib.title}</td>"
       puts "<td>#{au.join(', ')}</td>"
       puts "</tr>"
